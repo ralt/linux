@@ -568,6 +568,16 @@ static int ioctl_fsthaw(struct file *filp)
 	return thaw_super(sb);
 }
 
+static int ioctl_fsgetfrozen(struct file *filp)
+{
+	struct super_block *sb = file_inode(filp)->i_sb;
+
+	if (!capable(CAP_SYS_ADMIN))
+		return -EPERM;
+
+	return sb->s_writers.frozen;
+}
+
 static long ioctl_file_dedupe_range(struct file *file, void __user *arg)
 {
 	struct file_dedupe_range __user *argp = arg;
@@ -651,6 +661,9 @@ int do_vfs_ioctl(struct file *filp, unsigned int fd, unsigned int cmd,
 	case FITHAW:
 		error = ioctl_fsthaw(filp);
 		break;
+
+	case FIGETFROZEN:
+		return put_user(ioctl_fsgetfrozen(filp), argp);
 
 	case FS_IOC_FIEMAP:
 		return ioctl_fiemap(filp, arg);
