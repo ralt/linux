@@ -1333,6 +1333,7 @@ struct super_block {
 	struct quota_info	s_dquot;	/* Diskquota specific options */
 
 	struct sb_writers	s_writers;
+	int			s_freezers;
 
 	char s_id[32];				/* Informational name */
 	u8 s_uuid[16];				/* UUID */

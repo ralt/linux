@@ -231,6 +231,7 @@ static struct super_block *alloc_super(struct file_system_type *type, int flags)
 	 */
 	down_write_nested(&s->s_umount, SINGLE_DEPTH_NESTING);
 	s->s_count = 1;
+	s->s_freezers = 0;
 	atomic_set(&s->s_active, 1);
 	mutex_init(&s->s_vfs_rename_mutex);
 	lockdep_set_class(&s->s_vfs_rename_mutex, &type->s_vfs_rename_key);
@@ -1275,12 +1276,12 @@ int freeze_super(struct super_block *sb)
 {
 	int ret;
 
+	sb->s_freezers++;
+	if (sb->s_writers.frozen != SB_UNFROZEN)
+		return 0;
+
 	atomic_inc(&sb->s_active);
 	down_write(&sb->s_umount);
-	if (sb->s_writers.frozen != SB_UNFROZEN) {
-		deactivate_locked_super(sb);
-		return -EBUSY;
-	}
 
 	if (!(sb->s_flags & MS_BORN)) {
 		up_write(&sb->s_umount);
@@ -1338,14 +1339,20 @@ EXPORT_SYMBOL(freeze_super);
  * @sb: the super to thaw
  *
  * Unlocks the filesystem and marks it writeable again after freeze_super().
+ * Since nesting freezes is allowed, only the last freeze actually unlocks.
  */
 int thaw_super(struct super_block *sb)
 {
 	int error;
 
+	sb->s_freezers--;
+	if (sb->s_freezers > 0)
+		return 0;
+
 	down_write(&sb->s_umount);
 	if (sb->s_writers.frozen == SB_UNFROZEN) {
 		up_write(&sb->s_umount);
+		sb->s_freezers++;
 		return -EINVAL;
 	}
 
