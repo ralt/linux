@@ -19,6 +19,7 @@ Contents:
    media/dvb-drivers/index
    media/v4l-drivers/index
    gpu/index
+   80211/index
 
 Indices and tables
 ==================
