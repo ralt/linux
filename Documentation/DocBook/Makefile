@@ -14,7 +14,7 @@ DOCBOOKS := z8530book.xml device-drivers.xml \
 	    genericirq.xml s390-drivers.xml uio-howto.xml scsi.xml \
 	    80211.xml debugobjects.xml sh.xml regulator.xml \
 	    alsa-driver-api.xml writing-an-alsa-driver.xml \
-	    tracepoint.xml w1.xml \
+	    tracepoint.xml \
 	    writing_musb_glue_layer.xml crypto-API.xml iio.xml
 
 ifeq ($(DOCBOOKS),)

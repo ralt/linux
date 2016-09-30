@@ -19,6 +19,7 @@ Contents:
    media/dvb-drivers/index
    media/v4l-drivers/index
    gpu/index
+   dallas-1-wire-bus/index
 
 Indices and tables
 ==================
