@@ -184,6 +184,8 @@ static int show_mountinfo(struct seq_file *m, struct vfsmount *mnt)
 		goto out;
 	if (sb->s_op->show_options)
 		err = sb->s_op->show_options(m, mnt->mnt_root);
+	if (sb->s_writers.frozen)
+		seq_puts(m, " frozen");
 	seq_putc(m, '\n');
 out:
 	return err;
